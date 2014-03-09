@@ -1,7 +1,8 @@
-module Tree (preorder, inorder, postorder, test)
+module Tree (preorder, inorder, postorder, Tree(..), test)
 where
   import qualified Data.Foldable as F
   import Data.Monoid
+  import DiffList
 
   data Tree a = Empty | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
 
@@ -50,3 +51,8 @@ where
   -- and the nicer interface
   preorder :: Tree a -> [a]
   preorder t = preorder' t []
+
+  -- using difference lists
+  preorder_dl :: Tree a -> DiffList a
+  preorder_dl Empty = mempty
+  preorder_dl (Node x l r) = (x `cons` preorder_dl l) `mappend` preorder_dl r
