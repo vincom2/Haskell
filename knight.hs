@@ -1,8 +1,6 @@
 import Data.List
 import Control.Monad
 
--- possible modifications: m or less, instead of exactly m
-
 type KnightPos = (Int,Int)
 type Moves = [KnightPos]
 
@@ -15,12 +13,17 @@ moveKnight xs@((c,r):_) = filter legalPos
 inM :: Int -> KnightPos -> [Moves]
 inM m start = return [start] >>= foldr (<=<) return (replicate m moveKnight)
 
+-- finds all reachable squares in n moves, 1 <= n <= m
+inAtMost :: Int -> KnightPos -> [(Int,[Moves])]
+inAtMost m start = map (\(n,f) -> (n,return [start] >>= foldr (<=<) return f)) allMoves
+  where allMoves = map (\n -> (n, replicate n moveKnight)) [1..m]
+
 canReachIn :: Int -> KnightPos -> KnightPos -> Moves
-canReachIn m start end = case find matchEnd threeAway of
+canReachIn m start end = case find matchEnd mAway of
                            Just moves -> reverse moves
                            Nothing -> []
   where matchEnd e = head e == end
-        threeAway = inM m start
+        mAway = inM m start
 
 main = do
   putStrLn "Enter <starting ending #moves> (blank line to exit):"
