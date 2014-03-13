@@ -15,6 +15,9 @@ where
                   (Node 8 Empty Empty)
                   (Node 10 Empty Empty)
               )
+  test2 = Node 7 Empty (Node 10 (Node 4 Empty Empty) (Node 3 Empty (Node 1 Empty (Node 2 Empty (Node 8 (Node 11 Empty Empty) Empty)))))
+
+  test3 = Node 'F' (Node 'B' (Node 'A' Empty Empty) (Node 'D' (Node 'C' Empty Empty) (Node 'E' Empty Empty))) (Node 'G' Empty (Node 'I' (Node 'H' Empty Empty) Empty))
 
   instance Functor Tree where
     fmap f Empty = Empty
@@ -34,8 +37,24 @@ where
   --inorder = F.foldMap (\x -> [x])
 
   -- this one should be efficient, O(n)
-  postorder :: Tree a -> [a]
-  postorder = F.foldl (flip (:)) []
+  -- holy fuck it's also WRONG
+  -- apparently I totally misunderstood what "postorder" is
+  -- mfw
+  postorder_slow :: Tree a -> [a]
+  --postorder = F.foldl (flip (:)) [] -- this will stay here so I remember my shame
+  postorder_slow Empty = []
+  postorder_slow (Node x l r) = (postorder_slow l) ++ (postorder_slow r) ++ [x]
+
+  -- my attempt to write a tail-recursive version
+  postorder' :: Tree a -> [a] -> [a]
+  postorder' Empty acc = acc
+  postorder' (Node x l r) acc =
+    let acc' = postorder' r (x:acc)
+    in postorder' l acc'
+
+  -- and the nicer interface
+  -- also I should totally swap the arguments of the tail-recursive version
+  postorder = (flip postorder') []
 
   -- I don't think there's a clever way of doing this one with folds D:
   -- but it's of course quite possible that I'm just bad
