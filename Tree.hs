@@ -36,6 +36,16 @@ where
   --inorder = F.toList
   --inorder = F.foldMap (\x -> [x])
 
+  -- bad
+  inorder_slow :: Tree a -> [a]
+  inorder_slow Empty = []
+  inorder_slow (Node x l r) = (inorder_slow l) ++ [x] ++ (inorder_slow r)
+
+  -- tail recursive
+  inorder' :: Tree a -> [a] -> [a]
+  inorder' Empty acc = acc
+  inorder' (Node x l r) acc = inorder' l (x:(inorder' r acc))
+
   -- this one should be efficient, O(n)
   -- holy fuck it's also WRONG
   -- apparently I totally misunderstood what "postorder" is
