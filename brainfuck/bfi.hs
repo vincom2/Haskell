@@ -38,11 +38,17 @@ checkSyntax s@(Source cs) =
   if n == 0 then Right s
     else Left (if n < 0 then "Mismatched closing bracket"
       else "Mismatched opening bracket")
-  -- of course this is shitty and doesn't terminate early the moment it goes negative
+  -- this is ugly. also I'm not sure it's idiomatic.
   where checkSyntax' n []               = n
-        checkSyntax' n (LoopLeft:rest)  = checkSyntax' (n+1) rest
-        checkSyntax' n (LoopRight:rest) = checkSyntax' (n-1) rest
-        checkSyntax' n (_:rest)         = checkSyntax' n rest
+        checkSyntax' n (LoopLeft:rest)
+          | n < 0 = n
+          | otherwise = checkSyntax' (n+1) rest
+        checkSyntax' n (LoopRight:rest)
+          | n < 0 = n
+          | otherwise = checkSyntax' (n-1) rest
+        checkSyntax' n (_:rest)
+          | n < 0 = n
+          | otherwise = checkSyntax' n rest
 
 parse :: String -> Either String Source
 parse bf = checkSyntax parsed
